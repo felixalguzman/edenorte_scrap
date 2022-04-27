@@ -22,4 +22,4 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet run -- -e {{secrets.email}} -p {{secrets.password}} -k {{secrets.key}} -u {{secrets.url}}
+      run: dotnet run --project edenorte_scrap -- -e {{secrets.email}} -p {{secrets.password}} -k {{secrets.key}} -u {{secrets.url}}
