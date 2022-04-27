@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "edenorte_scrap": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "password": "KUxUzYYxXYn5Kk",
+        "email": "aqgarcia@hotmail.com"
+      }
+    }
+  }
+}
