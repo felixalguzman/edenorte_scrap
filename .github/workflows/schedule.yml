@@ -19,5 +19,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet run --project edenorte_scrap -- -e {{secrets.EMAIL}} -p {{secrets.PASSWORD}} -k {{secrets.KEY}} -u {{secrets.URL}}
+    - name: Current dir
+      run: ls -R 
+    - name: Run
+      run: cd edenorte_scrap && dotnet run --project edenorte_scrap -- -e {{secrets.EMAIL}} -p {{secrets.PASSWORD}} -k {{secrets.KEY}} -u {{secrets.URL}}
