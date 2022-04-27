@@ -1,10 +1,6 @@
 name: .NET
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   schedule:
     - cron: "0 0 * * *"
 
@@ -26,4 +22,4 @@ jobs:
     - name: Current dir
       run: ls -R 
     - name: Run
-      run: cd edenorte_scrap && dotnet run --project edenorte_scrap -- -e {{secrets.EMAIL}} -p {{secrets.PASSWORD}} -k {{secrets.KEY}} -u {{secrets.URL}}
+      run: dotnet run --project edenorte_scrap -- -e {{secrets.EMAIL}}
