@@ -17,18 +17,20 @@ internal static class Program
     private static readonly HttpClient Client = new();
     private static readonly DateTimeFormatInfo dtfi = CultureInfo.GetCultureInfo("es-US").DateTimeFormat;
 
-    private static Task Main(string[] args)
+    private static async Task Main(string[] args)
     {
-        var result = Parser.Default.ParseArguments<Options>(args)
-            .WithParsed(async o =>
+        var result = await Parser.Default.ParseArguments<Options>(args)
+            .WithParsedAsync(async o =>
             {
                 await RunWithOptionsAsync(o);
-            })
-            .WithNotParsed(err =>
+            });
+
+        result.WithNotParsed(err =>
             {
                 Console.WriteLine(err);
             });
-        return Task.CompletedTask;
+
+
     }
 
     static async Task RunWithOptionsAsync(Options options)
@@ -36,17 +38,19 @@ internal static class Program
         var tokenHeaderMap = await CurrentToken();
         var headers = await Login(options.Email, options.Password, tokenHeaderMap);
         var contracts = await GetContracts(headers);
-        var instance = Supabase.Client.Instance;
 
-        await Supabase.Client.InitializeAsync(options.SupabaseUrl, options.SupabaseKey);
+       var client = await Supabase.Client.InitializeAsync(options.SupabaseUrl, options.SupabaseKey);
+
+        Console.WriteLine("All data init");
 
         foreach (var contract in contracts)
         {
-            var existing = await instance.From<Contract>().Filter("number", Postgrest.Constants.Operator.Equals, contract.Number)
-                .Single();
-            if (existing == null)
+            var existing = await client.From<Contract>().Filter("number", Postgrest.Constants.Operator.Equals, contract.Number)
+                .Limit(1)
+                .Get();
+            if (existing.Models.FirstOrDefault() == null)
             {
-                var response = await instance.From<Contract>().Insert(contract);
+                var response = await client.From<Contract>().Insert(contract);
                 var newContract = response.Models.FirstOrDefault();
 
                 if (newContract != null)
@@ -57,7 +61,7 @@ internal static class Program
             }
             else
             {
-                contract.Id = existing.Id;
+                contract.Id = existing.Models.First().Id;
 
             }
         }
@@ -68,7 +72,7 @@ internal static class Program
             var beginning = consumption.DateCreated.Date;
             var end = beginning.AddHours(23);
 
-            var existing = await instance.From<Consumption>().Filter("contract_id", Postgrest.Constants.Operator.Equals, consumption.ContractId)
+            var existing = await client.From<Consumption>().Filter("contract_id", Postgrest.Constants.Operator.Equals, consumption.ContractId)
                 .And(new List<Postgrest.QueryFilter>
                 {
                     new Postgrest.QueryFilter("created_at", Postgrest.Constants.Operator.GreaterThanOrEqual, beginning),
@@ -79,7 +83,7 @@ internal static class Program
 
             if (existing == null)
             {
-                await instance.From<Consumption>().Insert(consumption);
+                await client.From<Consumption>().Insert(consumption);
 
             }
 
