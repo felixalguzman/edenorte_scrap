@@ -22,4 +22,4 @@ jobs:
     - name: Current dir
       run: ls -R 
     - name: Run
-      run: dotnet run --project edenorte_scrap -- -e {{secrets.EMAIL}}
+      run: dotnet run --project edenorte_scrap -- --e {{secrets.EMAIL}}  --p {{secrets.PASSWORD}} --k {{secrets.KEY}} --u {{secrets.URL}}
